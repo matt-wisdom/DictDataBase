@@ -1,4 +1,5 @@
 import glob
+from pathlib import Path
 from .objects import DDBSession, DDBMultiSession, PathDict
 from . import utils
 from . import config
@@ -25,7 +26,7 @@ def expand_find_path_pattern(pattern):
 
 
 
-def _to_path_if_tuple(s):
+def _to_path_if_tuple(s: str | tuple):
 	if isinstance(s, tuple) and len(s) > 0:
 		return "/".join(list(s))
 	return s
@@ -80,12 +81,16 @@ def multiread(*pattern, as_PathDict: bool = False):
 
 
 
-def create(*db_name, db={}):
+def create(*db_name, db: dict | PathDict = None, overwrite: bool = False):
 	db_name = _to_path_if_tuple(db_name)
-	if isinstance(db, PathDict):
-		utils.protected_write_dict_as_json(db_name, db.dict)
-	else:
-		utils.protected_write_dict_as_json(db_name, db)
+
+	# Error if db already exists and overwrite is not allowed
+	json_path, ddb_path = utils.db_paths(db_name)
+	if not overwrite and (json_path or ddb_path):
+		raise FileExistsError(f"Database {db_name} already exists")
+
+	db = db.dict if isinstance(db, PathDict) else db
+	utils.protected_write_dict_as_json(db_name, db)
 
 
 
@@ -97,6 +102,7 @@ def delete(*db_name):
 def session(*db_name, as_PathDict: bool = False):
 	db_name = _to_path_if_tuple(db_name)
 	return DDBSession(db_name, as_PathDict=as_PathDict)
+
 
 def multisession(*pattern, as_PathDict: bool = False):
 	"""
