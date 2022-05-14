@@ -81,7 +81,7 @@ def multiread(*pattern, as_PathDict: bool = False):
 
 
 
-def create(*db_name, db: dict | PathDict = None, overwrite: bool = False):
+def create(*db_name, overwrite: bool = False, db: dict | PathDict = None):
 	db_name = _to_path_if_tuple(db_name)
 
 	# Error if db already exists and overwrite is not allowed
