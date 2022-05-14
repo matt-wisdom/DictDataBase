@@ -85,11 +85,14 @@ def create(*db_name, db: dict | PathDict = None, overwrite: bool = False):
 	db_name = _to_path_if_tuple(db_name)
 
 	# Error if db already exists and overwrite is not allowed
-	json_path, ddb_path = utils.db_paths(db_name)
-	if not overwrite and (json_path or ddb_path):
+	_, json_exists, _, ddb_exits = utils.db_paths(db_name)
+	if not overwrite and (json_exists or ddb_exits):
 		raise FileExistsError(f"Database {db_name} already exists")
 
-	db = db.dict if isinstance(db, PathDict) else db
+	if isinstance(db, PathDict):
+		db = db.dict
+	if db is None:
+		db = {}
 	utils.protected_write_dict_as_json(db_name, db)
 
 
