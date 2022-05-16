@@ -21,24 +21,6 @@ T2 = TypeVar("T2")
 ################################################################################
 
 
-class sp_test_must_except():
-    def __init__(self, exception_type: Type[Exception]):
-        self.exception_type = exception_type
-
-    def __enter__(self):
-        pass
-
-    def __exit__(self, exc_type, exc_value, traceback):
-        if not exc_type:
-            raise Exception(f"Expected an exception of type {self.exception_type}")
-        if not issubclass(exc_type, self.exception_type):
-            raise Exception(f"Expected an exception of type {self.exception_type}, got {exc_type}")
-        # Return True to surpress the exception
-        return True
-
-
-
-
 def setup():
     DDB.config.storage_directory = ".ddb_storage_testing"
     DDB.config.pretty_json_files = True
@@ -316,13 +298,13 @@ def test_ObjectMixin_init_by_kwargs():
     assert u1.hobbies == ["swim", 3]
 
     # Missing attribute should raise AttributeError
-    with sp_test_must_except(AttributeError):
+    with sp.test_must_except(AttributeError):
         User(id=1)
 
     # Wrong type should raise TypeError
-    with sp_test_must_except(TypeError):
+    with sp.test_must_except(TypeError):
         User(id="1", hobbies=["swim", 3])
-    with sp_test_must_except(TypeError):
+    with sp.test_must_except(TypeError):
         User(id=1, hobbies="swim")
 
 
@@ -338,13 +320,13 @@ def test_ObjectMixin_init_by_dict():
     assert u1.hobbies == ["swim", 3]
 
     # Missing attribute should raise AttributeError
-    with sp_test_must_except(AttributeError):
+    with sp.test_must_except(AttributeError):
         User({"id": 1})
 
     # Wrong type should raise TypeError
-    with sp_test_must_except(TypeError):
+    with sp.test_must_except(TypeError):
         User({"id": "1", "hobbies": ["swim", 3]})
-    with sp_test_must_except(TypeError):
+    with sp.test_must_except(TypeError):
         User({"id": 1, "hobbies": "swim"})
 
 
