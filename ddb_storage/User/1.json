@@ -1,0 +1,13 @@
+{
+	"age": 999,
+	"first_name": "John",
+	"id": 1,
+	"last_name": "Doe",
+	"preferences": {
+		"dark_mode": true,
+		"favorite_colors": [
+			"green",
+			"blue"
+		]
+	}
+}
