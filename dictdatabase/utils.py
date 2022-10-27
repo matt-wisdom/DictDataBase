@@ -60,6 +60,10 @@ def expand_find_path_pattern(path):
 	return [f for r in res for f in find(*r)]
 
 
+import ctypes
+c_code = ctypes.CDLL(f"{os.path.dirname(__file__)}/c_code/seek.so")
+
+
 def seek_index_through_value(data: str, index: int) -> int:
 	"""
 	Finds the index of the next comma or closing bracket/brace, but only if
@@ -72,7 +76,6 @@ def seek_index_through_value(data: str, index: int) -> int:
 	Returns:
 	- The end index of the value.
 	"""
-
 	# See https://www.json.org/json-en.html for the JSON syntax
 
 	skip_next, in_str, list_depth, dict_depth = False, False, 0, 0
@@ -98,7 +101,15 @@ def seek_index_through_value(data: str, index: int) -> int:
 		elif current == "}":
 			dict_depth -= 1
 		if list_depth == 0 and dict_depth == 0:
-			return i + 1
+			print(index)
+			v = c_code.seek_index_through_value(bytes(data, encoding="utf-8"), index)
+			print(v - index, i + 1 - index)
+			print("C:")
+			print(data[v-10:v-1] + f">{data[v]}<" + data[v+1:v+10])
+			print("Python:")
+			i += 1
+			print(data[i-10:i-1] + f">{data[i]}<" + data[i+1:i+10])
+			return i
 
 	raise TypeError("Invalid JSON syntax")
 
